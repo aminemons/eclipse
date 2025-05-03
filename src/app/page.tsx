@@ -11,136 +11,13 @@ import {
     BarChart2,
     Users,
     Cpu,
-    DollarSign, Clock, UserCheck, BarChart, Star, LogIn, Calendar, X, ChevronDown, ChevronUp
+    DollarSign, Clock, UserCheck, BarChart, Star, LogIn
 } from "lucide-react";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-
-// Mock data for job offers
-const jobOffers = [
-    {
-        id: 1,
-        title: "Frontend Developer",
-        department: "Engineering",
-        location: "Remote",
-        salary: "$90,000 - $120,000",
-        type: "Full-time",
-        posted: "2 days ago",
-        description: "We're looking for an experienced Frontend Developer to join our team. You'll work with React, Next.js, and our design system to build beautiful, performant user interfaces.",
-        requirements: [
-            "3+ years of professional frontend development experience",
-            "Expertise in React, TypeScript, and modern CSS",
-            "Experience with responsive design and accessibility",
-            "Familiarity with Next.js or similar frameworks"
-        ],
-        status: "Interview Scheduled",
-        candidates: [
-            {
-                id: 101,
-                name: "Alex Johnson",
-                email: "alex.johnson@example.com",
-                status: "Interview Scheduled",
-                interviewDate: "2023-11-15T14:00:00",
-                resume: "Alex_Johnson_Resume.pdf",
-                skills: ["React", "TypeScript", "CSS", "Next.js"],
-                experience: "4 years"
-            },
-            {
-                id: 102,
-                name: "Sam Wilson",
-                email: "sam.wilson@example.com",
-                status: "Interview Scheduled",
-                interviewDate: "2023-11-16T10:30:00",
-                resume: "Sam_Wilson_Resume.pdf",
-                skills: ["React", "JavaScript", "Redux", "Jest"],
-                experience: "5 years"
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: "UX Designer",
-        department: "Design",
-        location: "New York, NY",
-        salary: "$85,000 - $110,000",
-        type: "Full-time",
-        posted: "1 week ago",
-        description: "Join our design team to create intuitive and beautiful user experiences. You'll work closely with product managers and engineers to bring designs to life.",
-        requirements: [
-            "Portfolio demonstrating strong UX/UI skills",
-            "3+ years of experience in product design",
-            "Proficiency in Figma and prototyping tools",
-            "Understanding of user research methodologies"
-        ],
-        status: "Reviewing Applications",
-        candidates: [
-            {
-                id: 201,
-                name: "Jordan Lee",
-                email: "jordan.lee@example.com",
-                status: "Application Received",
-                resume: "Jordan_Lee_Resume.pdf",
-                skills: ["Figma", "User Research", "Prototyping", "UI Design"],
-                experience: "3 years"
-            }
-        ]
-    },
-    {
-        id: 3,
-        title: "DevOps Engineer",
-        department: "Engineering",
-        location: "San Francisco, CA",
-        salary: "$130,000 - $160,000",
-        type: "Full-time",
-        posted: "3 days ago",
-        description: "We need a DevOps engineer to help us scale our infrastructure and improve our deployment processes. You'll work with AWS, Kubernetes, and Terraform.",
-        requirements: [
-            "5+ years of DevOps experience",
-            "Deep knowledge of AWS services",
-            "Experience with Kubernetes and containerization",
-            "Infrastructure as code (Terraform preferred)"
-        ],
-        status: "Screening",
-        candidates: []
-    }
-];
-
-// Mock HR schedule
-const hrSchedule = [
-    {
-        id: 1,
-        date: "2023-11-15",
-        slots: [
-            { time: "09:00-10:00", available: false, meeting: "Standup" },
-            { time: "10:30-11:30", available: true },
-            { time: "14:00-15:00", available: false, meeting: "Interview with Alex Johnson" },
-            { time: "15:30-16:30", available: true }
-        ]
-    },
-    {
-        id: 2,
-        date: "2023-11-16",
-        slots: [
-            { time: "09:30-10:30", available: false, meeting: "Team Sync" },
-            { time: "10:30-11:30", available: false, meeting: "Interview with Sam Wilson" },
-            { time: "13:00-14:00", available: true },
-            { time: "14:30-15:30", available: true }
-        ]
-    },
-    {
-        id: 3,
-        date: "2023-11-17",
-        slots: [
-            { time: "10:00-11:00", available: true },
-            { time: "11:30-12:30", available: true },
-            { time: "14:00-15:00", available: false, meeting: "Candidate Review" },
-            { time: "15:30-16:30", available: true }
-        ]
-    }
-];
 
 export default function HomePage() {
     const section2Ref = useRef(null);
@@ -158,11 +35,6 @@ export default function HomePage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    // HR Portal state
-    const [selectedJob, setSelectedJob] = useState(null);
-    const [showSchedule, setShowSchedule] = useState(false);
-    const [notification, setNotification] = useState(null);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -185,40 +57,6 @@ export default function HomePage() {
                 break;
             default:
                 setError('Invalid email');
-        }
-    };
-
-    const scheduleInterview = (candidate) => {
-        // Find next available slot in HR schedule
-        let scheduled = false;
-        const updatedSchedule = hrSchedule.map(day => {
-            if (scheduled) return day;
-
-            const availableSlot = day.slots.find(slot => slot.available);
-            if (availableSlot) {
-                availableSlot.available = false;
-                availableSlot.meeting = `Interview with ${candidate.name}`;
-                candidate.interviewDate = `${day.date}T${availableSlot.time.split('-')[0]}:00`;
-                candidate.status = "Interview Scheduled";
-                scheduled = true;
-
-                // Show notification
-                setNotification({
-                    type: 'success',
-                    message: `Interview scheduled for ${candidate.name} on ${day.date} at ${availableSlot.time.split('-')[0]}. Email sent to candidate.`
-                });
-
-                setTimeout(() => setNotification(null), 5000);
-            }
-            return day;
-        });
-
-        if (!scheduled) {
-            setNotification({
-                type: 'error',
-                message: 'No available slots in HR schedule. Please check back later or add more availability.'
-            });
-            setTimeout(() => setNotification(null), 5000);
         }
     };
 
@@ -296,180 +134,6 @@ export default function HomePage() {
                                 Login
                             </button>
                         </form>
-                    </div>
-                </div>
-            )}
-
-            {/* HR Portal Modal */}
-            {activeTab === 'hr' && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 pt-20 overflow-y-auto">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl p-6 relative">
-                        <button
-                            onClick={() => setActiveTab('department')}
-                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-                        >
-                            <X size={24} />
-                        </button>
-
-                        <h2 className="text-3xl font-bold text-gray-800 mb-6">HR Portal Dashboard</h2>
-
-                        {/* Notification */}
-                        {notification && (
-                            <div className={`mb-6 p-4 rounded-md ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                {notification.message}
-                            </div>
-                        )}
-
-                        {/* Tabs */}
-                        <div className="flex border-b border-gray-200 mb-6">
-                            <button
-                                className={`py-2 px-4 font-medium ${!showSchedule ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                                onClick={() => setShowSchedule(false)}
-                            >
-                                Job Openings
-                            </button>
-                            <button
-                                className={`py-2 px-4 font-medium ${showSchedule ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                                onClick={() => setShowSchedule(true)}
-                            >
-                                My Schedule
-                            </button>
-                        </div>
-
-                        {/* Content */}
-                        {showSchedule ? (
-                            <div>
-                                <h3 className="text-2xl font-bold mb-6 text-gray-700">Interview Schedule</h3>
-                                <div className="space-y-6">
-                                    {hrSchedule.map(day => (
-                                        <div key={day.id} className="bg-gray-50 rounded-lg p-6">
-                                            <h4 className="text-xl font-semibold mb-4">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</h4>
-                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                                {day.slots.map((slot, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className={`p-4 rounded border ${slot.available ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-white'} shadow-sm`}
-                                                    >
-                                                        <div className="font-medium">{slot.time}</div>
-                                                        {!slot.available && (
-                                                            <div className="mt-2 text-sm text-gray-600">{slot.meeting}</div>
-                                                        )}
-                                                        {slot.available && (
-                                                            <div className="mt-2 text-sm text-green-600">Available</div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <div className="mb-6 flex justify-between items-center">
-                                    <h3 className="text-2xl font-bold text-gray-700">Current Job Openings</h3>
-                                    <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                                        + Create New Job
-                                    </button>
-                                </div>
-
-                                <div className="space-y-6">
-                                    {jobOffers.map(job => (
-                                        <div key={job.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <div
-                                                className="p-6 cursor-pointer hover:bg-gray-50 transition"
-                                                onClick={() => setSelectedJob(selectedJob?.id === job.id ? null : job)}
-                                            >
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <h4 className="text-xl font-bold text-gray-800">{job.title}</h4>
-                                                        <div className="flex flex-wrap gap-2 mt-2">
-                                                            <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">{job.department}</span>
-                                                            <span className="text-sm bg-gray-100 text-gray-800 px-2 py-1 rounded">{job.location}</span>
-                                                            <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">{job.salary}</span>
-                                                            <span className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded">{job.type}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-sm text-gray-500">{job.posted}</span>
-                                                        <span className="text-sm bg-gray-200 text-gray-800 px-2 py-1 rounded">{job.status}</span>
-                                                        {selectedJob?.id === job.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {selectedJob?.id === job.id && (
-                                                <div className="border-t border-gray-200 p-6 bg-gray-50">
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                        <div className="md:col-span-2">
-                                                            <h5 className="font-bold text-lg mb-2">Job Description</h5>
-                                                            <p className="text-gray-700 mb-4">{job.description}</p>
-
-                                                            <h5 className="font-bold text-lg mb-2">Requirements</h5>
-                                                            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                                                                {job.requirements.map((req, i) => (
-                                                                    <li key={i}>{req}</li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-
-                                                        <div>
-                                                            <h5 className="font-bold text-lg mb-4">Candidates ({job.candidates.length})</h5>
-
-                                                            {job.candidates.length > 0 ? (
-                                                                <div className="space-y-4">
-                                                                    {job.candidates.map(candidate => (
-                                                                        <div key={candidate.id} className="border border-gray-200 rounded p-4 bg-white">
-                                                                            <div className="flex justify-between">
-                                                                                <div>
-                                                                                    <h6 className="font-medium">{candidate.name}</h6>
-                                                                                    <p className="text-sm text-gray-600">{candidate.email}</p>
-                                                                                </div>
-                                                                                <span className={`text-xs px-2 py-1 rounded ${
-                                                                                    candidate.status === "Interview Scheduled" ? "bg-blue-100 text-blue-800" :
-                                                                                        candidate.status === "Application Received" ? "bg-yellow-100 text-yellow-800" :
-                                                                                            "bg-gray-100 text-gray-800"
-                                                                                }`}>
-                                                                                    {candidate.status}
-                                                                                </span>
-                                                                            </div>
-
-                                                                            <div className="mt-3 text-sm">
-                                                                                <p><span className="font-medium">Experience:</span> {candidate.experience}</p>
-                                                                                <p><span className="font-medium">Skills:</span> {candidate.skills.join(", ")}</p>
-                                                                                {candidate.interviewDate && (
-                                                                                    <p className="mt-2">
-                                                                                        <span className="font-medium">Interview:</span> {new Date(candidate.interviewDate).toLocaleString()}
-                                                                                    </p>
-                                                                                )}
-                                                                            </div>
-
-                                                                            {candidate.status !== "Interview Scheduled" && (
-                                                                                <button
-                                                                                    onClick={() => scheduleInterview(candidate)}
-                                                                                    className="mt-3 w-full bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700 transition"
-                                                                                >
-                                                                                    Schedule Interview (Auto-schedule based on HR availability)
-                                                                                </button>
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            ) : (
-                                                                <div className="text-center py-8 text-gray-500">
-                                                                    <p>No candidates have applied yet.</p>
-                                                                    <p className="text-sm mt-2">Check back later or promote this job opening.</p>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             )}
@@ -778,4 +442,149 @@ export default function HomePage() {
                             },
                             {
                                 quote: "The RPA automation saved our team 20+ hours per week on administrative tasks. Game changer for our lean HR team.",
-                                name: "
+                                name: "Michael Chen",
+                                title: "HR Manager, GlobalSoft",
+                                rating: 4,
+                                avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+                            },
+                            {
+                                quote: "Our candidate satisfaction scores improved dramatically thanks to the transparent communication features.",
+                                name: "David Rodriguez",
+                                title: "VP People, NexGen Labs",
+                                rating: 5,
+                                avatar: "https://randomuser.me/api/portraits/men/65.jpg"
+                            }
+                        ].map((testimonial, index) => (
+                            <div key={index} className="bg-white/5 p-8 rounded-xl border border-blue-800 hover:border-blue-600 transition-all">
+                                <div className="flex gap-1 mb-4">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star
+                                            key={i}
+                                            fill={i < testimonial.rating ? "#60a5fa" : "none"}
+                                            stroke="#60a5fa"
+                                            size={16}
+                                        />
+                                    ))}
+                                </div>
+                                <blockquote className="text-lg italic text-blue-100 mb-6">
+                                    "{testimonial.quote}"
+                                </blockquote>
+                                <div className="flex items-center gap-4">
+                                    <img
+                                        src={testimonial.avatar}
+                                        alt={testimonial.name}
+                                        className="w-12 h-12 rounded-full object-cover"
+                                    />
+                                    <div>
+                                        <p className="font-bold">{testimonial.name}</p>
+                                        <p className="text-sm text-blue-300">{testimonial.title}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="bg-gray-50 py-12 px-4 border-t border-gray-200">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-between gap-8">
+                        {/* Company Info */}
+                        <div className="md:w-1/3 mb-8 md:mb-0">
+                            <img
+                                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Layer_1-GaGeOg7GR50SS265uNDW4gaB1SKQnM.png"
+                                alt="HireBerg Logo"
+                                className="w-24 h-auto mb-4"
+                            />
+                            <p className="text-gray-600 mb-4">
+                                HireBerg connects top talent with innovative companies worldwide. Our AI-powered platform makes hiring effortless.
+                            </p>
+                            <div className="flex items-center gap-2 text-gray-500">
+                                <Phone size={18} />
+                                <span>+1 (555) 123-4567</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-500 mt-1">
+                                <Mail size={18} />
+                                <span>info@hireberg.com</span>
+                            </div>
+                        </div>
+
+                        {/* Footer Links */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:w-2/3">
+                            <div>
+                                <h3 className="font-semibold text-lg mb-4 text-gray-800">For Candidates</h3>
+                                <ul className="space-y-2 text-gray-600">
+                                    <li><a href="#" className="hover:text-blue-600 transition">Browse Jobs</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Candidate Profile</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Job Alerts</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Career Advice</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Salary Calculator</a></li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold text-lg mb-4 text-gray-800">For Employers</h3>
+                                <ul className="space-y-2 text-gray-600">
+                                    <li><a href="#" className="hover:text-blue-600 transition">Post a Job</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Browse Candidates</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Recruiting Solutions</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">HR Resources</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Pricing Plans</a></li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h3 className="font-semibold text-lg mb-4 text-gray-800">Company</h3>
+                                <ul className="space-y-2 text-gray-600">
+                                    <li><a href="#" className="hover:text-blue-600 transition">About Us</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Contact</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Careers</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Blog</a></li>
+                                    <li><a href="#" className="hover:text-blue-600 transition">Help Center</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-8"></div>
+
+                    {/* Bottom Section */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                        {/* Copyright */}
+                        <p className="text-gray-500 text-sm">
+                            © {new Date().getFullYear()} HireBerg, Inc. All rights reserved.
+                        </p>
+
+                        {/* Social Links */}
+                        <div className="flex justify-center gap-6">
+                            <a href="#" className="text-gray-500 hover:text-blue-600 transition" aria-label="Facebook">
+                                <Facebook size={20} />
+                            </a>
+                            <a href="#" className="text-gray-500 hover:text-blue-400 transition" aria-label="Twitter">
+                                <Twitter size={20} />
+                            </a>
+                            <a href="#" className="text-gray-500 hover:text-blue-700 transition" aria-label="LinkedIn">
+                                <Linkedin size={20} />
+                            </a>
+                            <a href="#" className="text-gray-500 hover:text-pink-600 transition" aria-label="Instagram">
+                                <Instagram size={20} />
+                            </a>
+                            <a href="#" className="text-gray-500 hover:text-red-600 transition" aria-label="YouTube">
+                                <Youtube size={20} />
+                            </a>
+                        </div>
+
+                        {/* Legal Links */}
+                        <div className="flex gap-4 text-sm">
+                            <a href="#" className="text-gray-500 hover:text-blue-600 transition">Privacy Policy</a>
+                            <a href="#" className="text-gray-500 hover:text-blue-600 transition">Terms of Service</a>
+                            <a href="#" className="text-gray-500 hover:text-blue-600 transition">Cookie Policy</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    );
+}

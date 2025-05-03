@@ -16,7 +16,8 @@ import {
     LineElement,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
-
+import {CheckCircle, Clock} from "lucide-react";
+// Adjust path as needed
 // Register Chart.js components
 ChartJS.register(
     CategoryScale,
@@ -63,6 +64,16 @@ type EvaluationResult = {
 };
 
 export default function HrPage() {
+    const [duration, setDuration] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (duration) {
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 5000); // Hide after 5 seconds
+        }
+    };
     const [requests, setRequests] = useState<ClientRequestData[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -391,6 +402,65 @@ export default function HrPage() {
                             }}
                         />
                         <span className="text-sm text-gray-400">Live System</span>
+                        <div className="bg-white/5 p-6 rounded-xl border border-blue-800 backdrop-blur-sm my-8">
+                            <h3 className="text-2xl font-bold mb-4 text-blue-300 flex items-center gap-2">
+                                <Clock className="text-blue-400" /> Automation Schedule
+                            </h3>
+
+                            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1">
+                                    <label htmlFor="duration" className="block text-blue-100 mb-2">
+                                        Set automatic review interval:
+                                    </label>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            id="duration"
+                                            value={duration}
+                                            onChange={(e) => setDuration(e.target.value)}
+                                            placeholder="e.g. 24 hours, 3 days, weekly"
+                                            className="w-full px-4 py-2 bg-blue-900/30 border border-blue-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex items-end">
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all flex items-center gap-2"
+                                    >
+                                        <CheckCircle size={18} /> Set Schedule
+                                    </button>
+                                </div>
+                            </form>
+
+                            {/* Styled Alert */}
+                            {showAlert && (
+                                <div className="mt-6 animate-fade-in">
+                                    <div className="bg-green-900/30 border border-green-700 rounded-lg p-4 backdrop-blur-sm">
+                                        <div className="flex items-start gap-3">
+                                            <CheckCircle className="text-green-400 mt-0.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-bold text-green-100">Automation Scheduled!</h4>
+                                                <p className="text-green-200">
+                                                    We will automatically review all job requests every <span className="font-semibold text-white">{duration}</span>.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Add this to your global CSS for the animation */}
+                            <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+      `}</style>
+                        </div>
                     </div>
                 </motion.div>
 
