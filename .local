@@ -1,0 +1,12 @@
+# --- DATABASE ---
+MONGODB_URI=mongodb://127.0.0.1:27017/data
+
+
+EMAIL_HOST=sandbox.smtp.mailtrap.io
+EMAIL_PORT=2525
+EMAIL_USER=f63cf8634ea6ec
+EMAIL_PASS=7fe77fb8d6d54d
+EMAIL_FROM=Recruitment App <smtp@mailtrap.io>
+
+
+GEMINI_API_KEY=AIzaSyBFMDpoh1I1XZ7Lqvs0kDCHySiyteizVig
