@@ -1,5 +1,6 @@
 'use client';
-
+"use client";
+import {CalendarDays, User, Briefcase, Bell, ChevronLeft, ChevronRight, BarChart} from "lucide-react";
 import { useState, useEffect, useTransition, useMemo } from 'react';
 import { getRequestsAction, treatRequestAction } from './actions';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -64,6 +65,93 @@ type EvaluationResult = {
 };
 
 export default function HrPage() {
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    // Fake schedule data
+    const scheduleData = [
+        {
+            id: 1,
+            time: "09:00 - 10:00",
+            title: "Team Standup Meeting",
+            type: "meeting",
+            participants: 8,
+            location: "Conference Room A"
+        },
+        {
+            id: 2,
+            time: "10:30 - 11:30",
+            title: "Candidate Interview - Frontend Developer",
+            type: "interview",
+            candidate: "Alex Johnson",
+            position: "Senior React Engineer"
+        },
+        {
+            id: 3,
+            time: "12:00 - 13:00",
+            title: "Lunch with Department Heads",
+            type: "meeting",
+            participants: 4,
+            location: "Executive Dining"
+        },
+        {
+            id: 4,
+            time: "14:00 - 15:30",
+            title: "New Hire Onboarding Session",
+            type: "onboarding",
+            newHires: 3,
+            department: "Engineering"
+        },
+        {
+            id: 5,
+            time: "16:00 - 17:00",
+            title: "Performance Review - Marketing Team",
+            type: "review",
+            employee: "Sarah Miller",
+            position: "Marketing Specialist"
+        }
+    ];
+
+    const navigateDays = (direction) => {
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() + (direction === 'prev' ? -1 : 1));
+        setCurrentDate(newDate);
+    };
+
+    const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    const getEventIcon = (type) => {
+        switch(type) {
+            case 'interview':
+                return <User className="text-blue-400" size={18} />;
+            case 'onboarding':
+                return <Briefcase className="text-green-400" size={18} />;
+            case 'review':
+                return <BarChart className="text-purple-400" size={18} />;
+            default:
+                return <Bell className="text-yellow-400" size={18} />;
+        }
+    };
+
+    const getEventColor = (type) => {
+        switch(type) {
+            case 'interview':
+                return 'bg-blue-900/20 border-blue-700';
+            case 'onboarding':
+                return 'bg-green-900/20 border-green-700';
+            case 'review':
+                return 'bg-purple-900/20 border-purple-700';
+            default:
+                return 'bg-yellow-900/20 border-yellow-700';
+        }
+    };
+
     const [duration, setDuration] = useState("");
     const [showAlert, setShowAlert] = useState(false);
 
@@ -739,6 +827,90 @@ export default function HrPage() {
 
                                     {/* Charts Section */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        <div className="bg-white/5 p-6 rounded-xl border border-blue-800 backdrop-blur-sm my-8">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <h3 className="text-2xl font-bold text-blue-300 flex items-center gap-2">
+                                                    <CalendarDays className="text-blue-400" /> HR Manager Schedule
+                                                </h3>
+                                                <div className="flex items-center gap-4">
+                                                    <button
+                                                        onClick={() => navigateDays('prev')}
+                                                        className="p-1 rounded-full hover:bg-white/10 transition"
+                                                    >
+                                                        <ChevronLeft className="text-blue-300" />
+                                                    </button>
+                                                    <span className="text-blue-100 font-medium">
+            {formatDate(currentDate)}
+          </span>
+                                                    <button
+                                                        onClick={() => navigateDays('next')}
+                                                        className="p-1 rounded-full hover:bg-white/10 transition"
+                                                    >
+                                                        <ChevronRight className="text-blue-300" />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {scheduleData.map((item) => (
+                                                    <div
+                                                        key={item.id}
+                                                        className={`p-4 rounded-lg border ${getEventColor(item.type)} transition-all hover:scale-[1.01] hover:shadow-lg`}
+                                                    >
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="mt-1">
+                                                                {getEventIcon(item.type)}
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <div className="flex justify-between items-start">
+                                                                    <h4 className="font-bold text-white">{item.title}</h4>
+                                                                    <div className="flex items-center gap-2 text-sm text-blue-300">
+                                                                        <Clock size={14} />
+                                                                        <span>{item.time}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {item.type === 'meeting' && (
+                                                                    <div className="mt-2 text-sm text-blue-200">
+                                                                        <p>Location: {item.location}</p>
+                                                                        <p>Participants: {item.participants}</p>
+                                                                    </div>
+                                                                )}
+
+                                                                {item.type === 'interview' && (
+                                                                    <div className="mt-2 text-sm text-blue-200">
+                                                                        <p>Candidate: <span className="text-white">{item.candidate}</span></p>
+                                                                        <p>Position: <span className="text-white">{item.position}</span></p>
+                                                                    </div>
+                                                                )}
+
+                                                                {item.type === 'onboarding' && (
+                                                                    <div className="mt-2 text-sm text-blue-200">
+                                                                        <p>Department: <span className="text-white">{item.department}</span></p>
+                                                                        <p>New Hires: <span className="text-white">{item.newHires}</span></p>
+                                                                    </div>
+                                                                )}
+
+                                                                {item.type === 'review' && (
+                                                                    <div className="mt-2 text-sm text-blue-200">
+                                                                        <p>Employee: <span className="text-white">{item.employee}</span></p>
+                                                                        <p>Position: <span className="text-white">{item.position}</span></p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="mt-6 flex justify-end">
+                                                <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium flex items-center gap-2 transition">
+                                                    <CalendarDays size={16} />
+                                                    Add New Event
+                                                </button>
+                                            </div>
+                                        </div>
+
                                         {/* Status Distribution Chart */}
                                         <motion.div
                                             variants={itemVariants}
