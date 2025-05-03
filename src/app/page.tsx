@@ -212,6 +212,18 @@ export default function HomePage() {
 
             {/* Hero Image */}
             <section className="bg-[#80C7EA] w-full relative">
+                {/* SVG Arrow positioned absolutely on the right */}
+                <div className="absolute right-60 top-97 z-10 w-120 h-120">
+                    <Image
+                        src="/kk.svg"
+                        alt="Decorative Arrow"
+                        width={64}
+                        height={64}
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+
+                {/* Hero Image */}
                 <Image
                     src="/5.svg"
                     alt="Hero Frame Description"
